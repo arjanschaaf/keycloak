@@ -14,8 +14,22 @@ if [ -n "${NEWRELIC_LICENSE_KEY+1}" ]
 then
     sed -i "s#<%= license_key %>#${NEWRELIC_LICENSE_KEY}#" newrelic/newrelic.yml
 else
-    echo "NEWRELIC_LICENSE_KEY is a requered environment variable that needs to be set"
+    echo "NEWRELIC_LICENSE_KEY is a required environment variable that needs to be set"
     exit 1;
+fi
+
+
+# mongo username is needed for authenticated access to mongo
+if [ -n "${MONGO_USERNAME+1}" ]
+then
+    INPUT=`cat /opt/jboss/keycloak/standalone/configuration/keycloak-server.json` && echo $INPUT | jq '.connectionsMongo.default.user = "${env.MONGO_USERNAME}"' > /opt/jboss/keycloak/standalone/configuration/keycloak-server.json
+fi
+
+# mongo password is needed for authenticated access to mongo
+if [ -n "${MONGO_PASSWORD+1}" ]
+then
+    INPUT=`cat /opt/jboss/keycloak/standalone/configuration/keycloak-server.json` && echo $INPUT | jq '.connectionsMongo.default.password = "${env.MONGO_PASSWORD}"' > /opt/jboss/keycloak/standalone/configuration/keycloak-server.json
+
 fi
 
 /opt/jboss/docker-entrypoint.sh "$@"
