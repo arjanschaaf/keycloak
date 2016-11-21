@@ -19,17 +19,11 @@ else
 fi
 
 
-# mongo username is needed for authenticated access to mongo
-if [ -n "${MONGO_USERNAME+1}" ]
+# mongo URI is a required property to feed MongoDB a relevant configuration
+if [ -z "${MONGODB_URI+1}" ]
 then
-    INPUT=`cat /opt/jboss/keycloak/standalone/configuration/keycloak-server.json` && echo $INPUT | jq '.connectionsMongo.default.user = "${env.MONGO_USERNAME}"' > /opt/jboss/keycloak/standalone/configuration/keycloak-server.json
-fi
-
-# mongo password is needed for authenticated access to mongo
-if [ -n "${MONGO_PASSWORD+1}" ]
-then
-    INPUT=`cat /opt/jboss/keycloak/standalone/configuration/keycloak-server.json` && echo $INPUT | jq '.connectionsMongo.default.password = "${env.MONGO_PASSWORD}"' > /opt/jboss/keycloak/standalone/configuration/keycloak-server.json
-
+    echo "MONGODB_URI is a required environment variable that needs to be set"
+    exit 1;
 fi
 
 /opt/jboss/docker-entrypoint.sh "$@"

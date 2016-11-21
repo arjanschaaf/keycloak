@@ -1,0 +1,17 @@
+embed-server --server-config=standalone.xml
+/subsystem=keycloak-server/spi=realm/:write-attribute(name=default-provider,value=mongo)
+/subsystem=keycloak-server/spi=user/:write-attribute(name=default-provider,value=mongo)
+/subsystem=keycloak-server/spi=userSessionPersister/:write-attribute(name=default-provider,value=mongo)
+/subsystem=keycloak-server/spi=authorizationPersister/:write-attribute(name=default-provider,value=mongo)
+/subsystem=keycloak-server/spi=userFederatedStorage/:remove
+/subsystem=keycloak-server/spi=userFederatedStorage/:add
+/subsystem=keycloak-server/spi=userFederatedStorage/provider=jpa/:add(enabled=false)
+/subsystem=keycloak-server/spi=eventsStore/:remove
+/subsystem=keycloak-server/spi=eventsStore/:add(default-provider=mongo)
+/subsystem=keycloak-server/spi=eventsStore/provider=mongo/:add(properties={exclude-events => "[\"REFRESH_TOKEN\"]"},enabled=true)
+/subsystem=keycloak-server/spi=connectionsJpa/:remove
+/subsystem=keycloak-server/spi=connectionsMongo/:add
+/subsystem=keycloak-server/spi=connectionsMongo/provider=default/:add(properties={db => "${env.MONGODB_DBNAME:keycloak}", migrationStrategy => "update", uri => "${env.MONGODB_URI}"},enabled=true)
+/socket-binding-group=standard-sockets/socket-binding=proxy-https:add(port="443")
+/subsystem=undertow/server=default-server/http-listener=default/:remove
+/subsystem=undertow/server=default-server/http-listener=default/:add(socket-binding="http",redirect-socket="proxy-https",proxy-address-forwarding="true")
