@@ -1,4 +1,4 @@
-FROM jboss/keycloak:2.3.0.Final
+FROM jboss/keycloak:2.2.0.Final
 
 ADD keycloak-entrypoint.sh keycloak-entrypoint.sh
 ADD mongo-configure.cli /opt/jboss/keycloak/
